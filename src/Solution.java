@@ -10,7 +10,7 @@ import java.util.ArrayList;
         alert(String value) - для строк
         Обрати внимание на то, что метод alert необходимо вызывать ПОСЛЕ вывода списка всех параметров на экран.
         */
-
+//раза ралада
 public class Solution {
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
