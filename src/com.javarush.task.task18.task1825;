@@ -1,0 +1,81 @@
+package com.javarush.task.task18.task1825;
+
+import java.io.*;
+import java.util.*;
+
+/* 
+Собираем файл
+Собираем файл из кусочков.
+Считывать с консоли имена файлов.
+Каждый файл имеет имя: [someName].partN.
+Например, Lion.avi.part1, Lion.avi.part2, ..., Lion.avi.part37.
+Имена файлов подаются в произвольном порядке. Ввод заканчивается словом "end".
+В папке, где находятся все прочтенные файлы, создать файл без суффикса [.partN].
+Например, Lion.avi.
+В него переписать все байты из файлов-частей используя буфер.
+Файлы переписывать в строгой последовательности, сначала первую часть, потом вторую, ..., в конце - последнюю.
+Закрыть потоки.
+
+Требования:
+1. Программа должна считывать имена файлов с консоли, пока не будет введено слово "end".
+2. Создай поток для записи в файл без суффикса [.partN] в папке, где находятся все считанные файлы.
+3. В новый файл перепиши все байты из файлов-частей *.partN.
+4. Чтение и запись должны происходить с использованием буфера.
+5. Созданные для файлов потоки должны быть закрыты.
+6. Не используй статические переменные.
+*/
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        ArrayList<String>list= new ArrayList<>();
+        while (true){
+            String name = reader.readLine();
+            if(name.equals("end")){
+                break;
+            }else list.add(name);
+        }
+        Collections.sort(list, new Comparator<String>() {
+            public int compare(String o1, String o2) {
+                return extractInt(o1) - extractInt(o2);
+            }
+
+            int extractInt(String s) {
+                String num = s.replaceAll("\\D", "");
+                // return 0 if no digits found
+                return num.isEmpty() ? 0 : Integer.parseInt(num);
+            }
+        }); 
+        String[] copy = list.get(0).split("\\.");
+        ArrayList<String>lisy = new ArrayList<>(Arrays.asList(copy));
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < lisy.size()-1; i++) {
+            sb.append(lisy.get(i)+".");
+        }
+        String d = sb.substring(0, sb.length() - 1).toString();
+        System.out.println(d);
+        File newFile = new File(d);
+        newFile.createNewFile();
+
+        for (String e : list) {
+            try {
+                FileInputStream inputStream = new FileInputStream(e);
+                // Создаем поток-записи-байт-в-файл
+                FileOutputStream outputStream = new FileOutputStream("c:/lion.txt", true);
+
+                byte[] buffer = new byte[1000];
+                while (inputStream.available() > 0) //пока есть еще непрочитанные байты
+                {
+                    // прочитать очередной блок байт в переменную buffer и реальное количество в count
+                    int count = inputStream.read(buffer);
+                    outputStream.write(buffer, 0, count); //записать блок(часть блока) во второй поток
+                }
+
+                inputStream.close(); //закрываем оба потока. Они больше не нужны.
+                outputStream.close();
+            }catch (IOException r){
+                System.out.println("ощибка");
+            }
+        }
+    }
+}
